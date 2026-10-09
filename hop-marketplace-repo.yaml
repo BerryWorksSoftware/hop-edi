@@ -1,0 +1,20 @@
+# Hop marketplace repository definition (shareable; no passwords)
+schemaVersion: '1.0'
+kind: hop-marketplace-repository
+id: berryworks
+name: BerryWorks EDI
+url: https://github.com/BerryWorksSoftware/hop-edi
+primary: false
+enabled: true
+browse: true
+urlTemplate: https://github.com/BerryWorksSoftware/hop-edi/releases/download/v${version}/${artifactId}-${version}.zip
+catalogUrl: https://raw.githubusercontent.com/BerryWorksSoftware/hop-edi/main/hop-marketplace-catalog.yaml
+includeSnapshots: false
+plugins:
+- groupId: com.berryworks
+  artifactId: hop-edi-plugin
+  version: 0.1.0
+  name: BerryWorks EDI Input
+  category: BerryWorks EDI
+  description: Read X12 and EDIFACT messages with model-based loop detection
+  minHopVersion: 2.19.0

@@ -1,0 +1,10 @@
+# BerryWorks plugins available for installation through Hop Marketplace.
+plugins:
+- groupId: com.berryworks
+  artifactId: hop-edi-plugin
+  version: 0.1.0
+  name: BerryWorks EDI Input
+  category: BerryWorks EDI
+  description: Read X12 and EDIFACT messages with model-based loop detection
+  minHopVersion: 2.19.0
+  installPath: plugins/transforms/hop-edi-plugin
