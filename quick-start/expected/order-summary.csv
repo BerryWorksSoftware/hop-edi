@@ -1,0 +1,2 @@
+po_number,order_date,buyer,ship_to,currency,line_count,calculated_value,review_required
+PO-10042,2026-10-09,Acme Retail,Chicago DC,USD,3,12450.00,Yes

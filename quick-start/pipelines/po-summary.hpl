@@ -1,0 +1,504 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pipeline>
+  <info>
+    <name>Purchase order business summary</name>
+    <pipeline_type>Normal</pipeline_type>
+    <parameters>
+      <parameter><name>QUICK_START_HOME</name><default_value>${PROJECT_HOME}</default_value><description>Absolute path to the quick-start folder</description></parameter>
+      <parameter>
+        <name>REVIEW_THRESHOLD</name>
+        <default_value>10000</default_value>
+        <description>Flag merchandise value strictly above this USD amount</description>
+      </parameter>
+    </parameters>
+  </info>
+  <notepads>
+    <notepad>
+      <note>X12 850 → three business lines → order total
+Set QUICK_START_HOME to the demo folder.
+Run with REVIEW_THRESHOLD=10000, then try 15000.
+Output CSV files are in QUICK_START_HOME/output.</note>
+      <xloc>80</xloc>
+      <yloc>30</yloc>
+      <width>650</width>
+      <heigth>95</heigth>
+      <fontname>Arial</fontname>
+      <fontsize>11</fontsize>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>255</backgroundcolorgreen>
+      <backgroundcolorblue>210</backgroundcolorblue>
+    </notepad>
+    <notepad>
+      <note>BEG = PO header; N1 BY/ST = parties; PO1 = line items.
+This sample uses USD and VP product identifiers.
+Merchandise value excludes tax, freight and adjustments.</note>
+      <xloc>80</xloc>
+      <yloc>460</yloc>
+      <width>650</width>
+      <heigth>95</heigth>
+      <fontname>Arial</fontname>
+      <fontsize>11</fontsize>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>255</backgroundcolorgreen>
+      <backgroundcolorblue>210</backgroundcolorblue>
+    </notepad>
+  </notepads>
+  <transform>
+    <name>Read X12 purchase order</name>
+    <type>BerryWorksEdiInput</type>
+    <copies>1</copies>
+    <distribute>Y</distribute>
+    <GUI>
+      <xloc>100</xloc>
+      <yloc>200</yloc>
+    </GUI>
+    <filename>${QUICK_START_HOME}/input/po-10042.edi</filename>
+    <modelsDirectory>${QUICK_START_HOME}/edi-models</modelsDirectory>
+  </transform>
+  <transform>
+    <name>Extract PO business fields</name>
+    <type>ScriptValueMod</type>
+    <copies>1</copies>
+    <distribute>Y</distribute>
+    <GUI>
+      <xloc>350</xloc>
+      <yloc>200</yloc>
+    </GUI>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform rows</jsScript_name>
+        <jsScript_script>// Keep header context while the model-aware parser emits each segment.
+var pipeline_Status = SKIP_PIPELINE;
+if (row_type == "SEGMENT") {
+  if (segment_id == "ST") { po_number=""; order_date=""; buyer=""; ship_to=""; currency=""; }
+  if (segment_id == "BEG") {
+    po_number=String(element_03);
+    var d=String(element_05); order_date=d.substring(0,4)+"-"+d.substring(4,6)+"-"+d.substring(6,8);
+  }
+  if (segment_id == "CUR") { currency=String(element_02); }
+  if (segment_id == "N1" &amp;&amp; element_01 == "BY") { buyer=String(element_02); }
+  if (segment_id == "N1" &amp;&amp; element_01 == "ST") { ship_to=String(element_02); }
+  if (segment_id == "PO1") {
+    if (!po_number || !buyer || !ship_to || currency != "USD" || element_06 != "VP") {
+      throw new Error("Demo expects header and BY/ST names before PO1, USD currency, and a VP product identifier.");
+    }
+    line_number=String(element_01); product=String(element_07);
+    quantity=new java.math.BigDecimal(String(element_02));
+    unit_price=new java.math.BigDecimal(String(element_04));
+    if (quantity.signum() &lt; 0 || unit_price.signum() &lt; 0) { throw new Error("Negative quantity or price is outside demo scope."); }
+    uom=String(element_03);
+    pipeline_Status=CONTINUE_PIPELINE;
+  }
+}</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Initialize PO context</jsScript_name>
+        <jsScript_script>var po_number="", order_date="", buyer="", ship_to="", currency="";</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>po_number</name>
+        <rename>po_number</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>order_date</name>
+        <rename>order_date</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>buyer</name>
+        <rename>buyer</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>ship_to</name>
+        <rename>ship_to</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>currency</name>
+        <rename>currency</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>line_number</name>
+        <rename>line_number</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>product</name>
+        <rename>product</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>quantity</name>
+        <rename>quantity</rename>
+        <type>BigNumber</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>uom</name>
+        <rename>uom</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>unit_price</name>
+        <rename>unit_price</rename>
+        <type>BigNumber</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+  </transform>
+  <transform>
+    <name>Calculate line value</name>
+    <type>Calculator</type>
+    <copies>1</copies>
+    <distribute>N</distribute>
+    <GUI>
+      <xloc>600</xloc>
+      <yloc>200</yloc>
+    </GUI>
+    <calculation>
+      <calc_type>MULTIPLY</calc_type>
+      <field_a>quantity</field_a>
+      <field_b>unit_price</field_b>
+      <field_name>extended_value</field_name>
+      <remove>N</remove>
+      <value_type>BigNumber</value_type>
+      <value_length>-1</value_length>
+      <value_precision>2</value_precision>
+    </calculation>
+  </transform>
+  <transform>
+    <name>Summarize purchase order</name>
+    <type>MemoryGroupBy</type>
+    <copies>1</copies>
+    <distribute>Y</distribute>
+    <GUI>
+      <xloc>840</xloc>
+      <yloc>300</yloc>
+    </GUI>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>po_number</name>
+      </field>
+      <field>
+        <name>order_date</name>
+      </field>
+      <field>
+        <name>buyer</name>
+      </field>
+      <field>
+        <name>ship_to</name>
+      </field>
+      <field>
+        <name>currency</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <aggregate>line_count</aggregate>
+        <subject>line_number</subject>
+        <type>COUNT_ALL</type>
+      </field>
+      <field>
+        <aggregate>calculated_value</aggregate>
+        <subject>extended_value</subject>
+        <type>SUM</type>
+      </field>
+    </fields>
+  </transform>
+  <transform>
+    <name>Flag high value order</name>
+    <type>ScriptValueMod</type>
+    <copies>1</copies>
+    <distribute>Y</distribute>
+    <GUI>
+      <xloc>1080</xloc>
+      <yloc>300</yloc>
+    </GUI>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform rows</jsScript_name>
+        <jsScript_script>var threshold = new java.math.BigDecimal(getVariable("REVIEW_THRESHOLD", "10000"));
+if (threshold.signum() &lt; 0) { throw new Error("Threshold must be non-negative."); }
+var review_required = new java.math.BigDecimal(String(calculated_value)).compareTo(threshold) &gt; 0 ? "Yes" : "No";</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>review_required</name>
+        <rename>review_required</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+  </transform>
+  <transform>
+    <name>Write order lines</name>
+    <type>TextFileOutput</type>
+    <copies>1</copies>
+    <distribute>Y</distribute>
+    <GUI>
+      <xloc>840</xloc>
+      <yloc>140</yloc>
+    </GUI>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <footer>N</footer>
+    <format>UNIX</format>
+    <encoding>UTF-8</encoding>
+    <compression>None</compression>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name>${QUICK_START_HOME}/output/order-lines</name>
+      <extention>csv</extention>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <do_not_open_new_file_init>N</do_not_open_new_file_init>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+    </file>
+    <fields>
+      <field>
+        <name>po_number</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>line_number</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>quantity</name>
+        <type>BigNumber</type>
+        <format>0.########</format>
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>uom</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>unit_price</name>
+        <type>BigNumber</type>
+        <format>0.00</format>
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>extended_value</name>
+        <type>BigNumber</type>
+        <format>0.00</format>
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+  </transform>
+  <transform>
+    <name>Write order summary</name>
+    <type>TextFileOutput</type>
+    <copies>1</copies>
+    <distribute>Y</distribute>
+    <GUI>
+      <xloc>1320</xloc>
+      <yloc>300</yloc>
+    </GUI>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <footer>N</footer>
+    <format>UNIX</format>
+    <encoding>UTF-8</encoding>
+    <compression>None</compression>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name>${QUICK_START_HOME}/output/order-summary</name>
+      <extention>csv</extention>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <do_not_open_new_file_init>N</do_not_open_new_file_init>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+    </file>
+    <fields>
+      <field>
+        <name>po_number</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>order_date</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>buyer</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>ship_to</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>currency</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>line_count</name>
+        <type>Integer</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>calculated_value</name>
+        <type>BigNumber</type>
+        <format>0.00</format>
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>review_required</name>
+        <type>String</type>
+        <format />
+        <decimal>.</decimal>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+  </transform>
+  <order>
+    <hop>
+      <from>Read X12 purchase order</from>
+      <to>Extract PO business fields</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Extract PO business fields</from>
+      <to>Calculate line value</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Calculate line value</from>
+      <to>Write order lines</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Calculate line value</from>
+      <to>Summarize purchase order</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Summarize purchase order</from>
+      <to>Flag high value order</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Flag high value order</from>
+      <to>Write order summary</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+</pipeline>

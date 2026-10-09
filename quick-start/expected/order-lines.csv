@@ -1,0 +1,4 @@
+po_number,line_number,product,quantity,uom,unit_price,extended_value
+PO-10042,1,WIDGET-A,100,EA,75.00,7500.00
+PO-10042,2,WIDGET-B,50,EA,90.00,4500.00
+PO-10042,3,WIDGET-C,30,EA,15.00,450.00

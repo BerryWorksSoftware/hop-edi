@@ -79,6 +79,12 @@ Use only one model for each message type and version in the selected folder.
 A matching model is required for model-based loop detection. Example pipelines
 and EDI input files are not bundled.
 
+## Quick Start
+
+Try the [X12 purchase order Quick Start](quick-start/README.md): turn a sample
+850 into line-detail and order-summary CSVs, calculate its merchandise value,
+and flag a high-value order for review.
+
 ## Preview behavior and limitations
 
 The transform emits `ENVELOPE`, `SEGMENT`, `LOOP_START`, `LOOP_END`, and `COMPOSITE`
