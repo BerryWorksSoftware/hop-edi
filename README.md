@@ -12,11 +12,38 @@ information and downloads; the development source is maintained separately.
 - Apache Hop 2.19.0
 - Java 21 or later
 
-## Download and install
+## Install through Hop Marketplace
 
-Download the obfuscated plugin ZIP and its SHA-256 checksum from
-[GitHub Releases](https://github.com/BerryWorksSoftware/hop-edi/releases) when the
-preview release is published. Release asset: `hop-edi-plugin-0.1.0.zip`.
+The preview is available through the **BerryWorks EDI** repository. Import it
+once to make the plugin appear in your Hop Marketplace; it is not included in
+Hop's default catalog. This workflow was verified with Hop 2.19.0 and release 0.1.0.
+
+1. Open **Tools → Marketplace** and select the **Repositories** tab.
+2. Click **Import from URL…** and paste:
+
+   ```text
+   https://raw.githubusercontent.com/BerryWorksSoftware/hop-edi/main/hop-marketplace-repo.yaml
+   ```
+
+3. Review the import preview: repository **BerryWorks EDI**, a GitHub release
+   download template, a catalog URL under this repository, and one plugin.
+   Confirm the import. Apache Repository can remain primary.
+4. Select **Plugins**, click **Refresh**, and search for `BerryWorks`.
+5. Select **BerryWorks EDI Input**, version **0.1.0**, and click **Install**.
+6. After Hop confirms installation, close Marketplace and restart Hop.
+7. In a pipeline, find **EDI Input** under **BerryWorks EDI** and configure it
+   as described below.
+
+If the status is **Present on disk**, Hop has found a manually installed copy.
+To test a fresh Marketplace installation, stop Hop, remove the installed
+`plugins/transforms/hop-edi-plugin/` folder, restart Hop, and follow the install
+steps above. Also remove the legacy `plugins/transforms/hop-transform-sample/`
+folder if present. These are folders in the Hop installation.
+
+## Manual ZIP installation
+
+Download `hop-edi-plugin-0.1.0.zip` and its SHA-256 checksum from the
+[0.1.0 preview release](https://github.com/BerryWorksSoftware/hop-edi/releases/tag/v0.1.0).
 
 1. Stop the Hop GUI and any other Hop processes using the installation.
 2. If upgrading, remove `plugins/transforms/hop-edi-plugin/` from the Hop
@@ -26,12 +53,9 @@ preview release is published. Release asset: `hop-edi-plugin-0.1.0.zip`.
    `hop-gui.sh` or `hop-gui.bat` and the `plugins` directory.
 4. Restart Hop. In a pipeline, find **EDI Input** under **BerryWorks EDI**.
 
-The installed plugin JAR is
-`plugins/transforms/hop-edi-plugin/hop-edi-plugin.jar`.
-
-Instructions for installation through Hop's Marketplace GUI will be added with
-the repository definition. The preview is not yet listed in the default
-Marketplace catalog.
+Both installation methods install the plugin JAR at
+`plugins/transforms/hop-edi-plugin/hop-edi-plugin.jar` and the models in its
+`models` subfolder.
 
 ## Configure EDI Input
 
