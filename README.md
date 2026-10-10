@@ -95,9 +95,8 @@ Recoverable parser errors are logged and parsing continues; fatal errors fail
 the transform. This preview performs parsing, not full EDI compliance validation.
 Trailer values are reconstructed.
 
-Explicit EDIFACT UNG/UNE groups, full UNB06 and UNH04 values, repeated elements,
-and nested composites are not supported. TRADACOMS and HL7 are outside the
-supported preview scope.
+Repeated elements, which appear on rare occasions with later X12 releases, are not supported in this preview.
+Similarly, TRADACOMS and HL7 are planned but not included in this preview.
 
 ## Components and licenses
 
