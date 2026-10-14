@@ -85,10 +85,9 @@ Try the [X12 purchase order Quick Start](quick-start/README.md): turn a sample
 850 into line-detail and order-summary CSVs, calculate its merchandise value,
 and flag a high-value order for review.
 
-For the upcoming HL7-enabled preview, try the [HL7 admission Quick Start](quick-start-hl7/README.md):
-extract procedures and insurance plans from a synthetic ADT^A01 message and
-inspect the model-based loop rows. This example requires the new preview build;
-release 0.1.0 does not support HL7.
+HL7 development and the admission Quick Start now have a separate home in the
+[BerryWorks HL7 plugin repository](https://github.com/BerryWorksSoftware/hop-hl7).
+The EDI plugin's 0.1.0 preview does not support HL7.
 
 ## Preview behavior and limitations
 
@@ -101,7 +100,7 @@ the transform. This preview performs parsing, not full EDI compliance validation
 Trailer values are reconstructed.
 
 Repeated elements, which appear on rare occasions with later X12 releases, are not supported in this preview.
-Similarly, TRADACOMS and HL7 are planned but not included in this preview.
+TRADACOMS is not included in this preview. HL7 is being developed as a separate plugin.
 
 ## Components and licenses
 
