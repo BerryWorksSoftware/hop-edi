@@ -85,6 +85,11 @@ Try the [X12 purchase order Quick Start](quick-start/README.md): turn a sample
 850 into line-detail and order-summary CSVs, calculate its merchandise value,
 and flag a high-value order for review.
 
+For the upcoming HL7-enabled preview, try the [HL7 admission Quick Start](quick-start-hl7/README.md):
+extract procedures and insurance plans from a synthetic ADT^A01 message and
+inspect the model-based loop rows. This example requires the new preview build;
+release 0.1.0 does not support HL7.
+
 ## Preview behavior and limitations
 
 The transform emits `ENVELOPE`, `SEGMENT`, `LOOP_START`, `LOOP_END`, and `COMPOSITE`
