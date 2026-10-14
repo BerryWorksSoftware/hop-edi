@@ -1,0 +1,5 @@
+patient_id,patient_name,group_type,loop_instance_number,item_code,item_description,organization
+DEMO-001,ALEX EXAMPLE,Procedure,1,DEMO-P1,Synthetic procedure one,
+DEMO-001,ALEX EXAMPLE,Procedure,2,DEMO-P2,Synthetic procedure two,
+DEMO-001,ALEX EXAMPLE,Insurance,3,DEMO-PLAN-1,Primary demo plan,EXAMPLE PRIMARY INSURER
+DEMO-001,ALEX EXAMPLE,Insurance,4,DEMO-PLAN-2,Secondary demo plan,EXAMPLE SECONDARY INSURER
